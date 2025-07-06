@@ -46,11 +46,11 @@ const addDoctor=async (req,res)=>{
 
         const newDoctor=new doctorModel(doctorData)
         await newDoctor.save()
-        res.json({success:true,messaage:"Doctor Added"})
+        res.json({success:true,message:"Doctor Added"})
 
     } catch (error) {
         console.log(error)
-        res.json({success:false,messaage:error.messaage})
+        res.json({success:false,message:error.message})
     }
 }
 
@@ -68,7 +68,7 @@ const loginAdmin= async (req,res)=>{
         }
     } catch (error) {
         console.log(error)
-        res.json({success:false,messaage:error.messaage})
+        res.json({success:false,message:error.message})
     }
 }
 //Api to get all doctors list for admin panel
@@ -78,7 +78,7 @@ const allDoctors=async (req,res)=>{
        res.json({success:true,doctors})
     } catch (error) {
         console.log(error)
-        res.json({success:false,messaage:error.messaage})
+        res.json({success:false,message:error.message})
     }
 }
 
