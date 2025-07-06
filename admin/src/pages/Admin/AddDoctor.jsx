@@ -46,7 +46,14 @@ const AddDoctor = () => {
         backendUrl + '/api/admin/add-doctor',
         formData,
         {
+<<<<<<< HEAD
           headers: {atoken:aToken}
+=======
+          headers: {
+            atoken: aToken,
+            'Content-Type': 'multipart/form-data'
+          }
+>>>>>>> 1b5a10d (commit)
         }
       )
       console.log(data);
@@ -74,10 +81,6 @@ const AddDoctor = () => {
        console.log(error);
     }
   }
-
-
-
-
 
   return (
     <form onSubmit={onSubmitHandler} className='m-5 w-full'>
