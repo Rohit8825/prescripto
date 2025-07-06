@@ -25,7 +25,7 @@ const AddDoctor = () => {
         return toast.error('Image Not Selected')
       }
       const formData=new FormData()
-      formData.append('docImg',docImg) // Use the field name expected by backend, e.g., 'docImg'
+      formData.append('image',docImg) // Use the field name expected by backend, e.g., 'docImg'
       formData.append('name',name)
       formData.append('email',email)
       formData.append('password',password)
@@ -46,11 +46,13 @@ const AddDoctor = () => {
         backendUrl + '/api/admin/add-doctor',
         formData,
         {
-          headers: {aToken}
+          headers: {atoken:aToken}
         }
       )
+      console.log(data);
        
       if(data.success){
+        console.log("Success")
         toast.success(data.message)
         console.log(data.message)
         setDocImg(false)
