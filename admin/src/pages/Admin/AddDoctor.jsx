@@ -46,14 +46,8 @@ const AddDoctor = () => {
         backendUrl + '/api/admin/add-doctor',
         formData,
         {
-<<<<<<< HEAD
-          headers: {atoken:aToken}
-=======
-          headers: {
-            atoken: aToken,
-            'Content-Type': 'multipart/form-data'
-          }
->>>>>>> 1b5a10d (commit)
+          headers: {atoken:aTok}
+
         }
       )
       console.log(data);
