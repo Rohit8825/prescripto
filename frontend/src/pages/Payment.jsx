@@ -29,6 +29,7 @@ const Payment = () => {
     },[])
 
     const simulateSuccess = async()=>{
+        
         try {
             const {data} = await axios.post(backendUrl + "/api/user/pay/success",{appointmentId},{headers:{token}});
             if(data.success){

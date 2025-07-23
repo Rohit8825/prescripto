@@ -70,11 +70,47 @@ const MyAppointments = () => {
             </div>
             <div></div>
             <div className='flex flex-col gap-3 justify-end items-center'>
-             {!item.cancelled &&!item.isCompleted && !item.payment && <button onClick={()=> navigate(`/payment/${item._id}`)} className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-[#5f6fff] hover:text-white transition-all duration-300 cursor-pointer'>Pay Online</button>} 
-             {item.payment && <button className='text-sm text-blue-900 text-center sm:min-w-48 py-2 border hover:bg-blue-100 border-blue-900 transition-all duration-300 cursor-not-allowed'>Paid</button>} 
-              {!item.cancelled && !item.isCompleted && !item.payment && <button onClick={()=>cancelAppointment(item._id,item.amount)}className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-600 hover:text-white transition-all duration-30 cursor-pointer'>Cancel Appointment</button>}
-              {item.cancelled && !item.isCompleted &&<button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500 cursor-not-allowed'>Appointment Cancelled</button>}
-              {item.isCompleted && <button className='sm:min-w-48 py-2 border border-green-500 text-green-500'>Completed</button>}
+              {!item.cancelled && !item.isCompleted && !item.payment && (
+                <button
+                  onClick={() => navigate(`/payment/${item._id}`)}
+                  className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-[#5f6fff] hover:text-white transition-all duration-300 cursor-pointer'
+                >
+                  Pay Online
+                </button>
+              )}
+              {item.payment && !item.cancelled && (
+                <button className='text-sm text-blue-900 text-center sm:min-w-48 py-2 border hover:bg-blue-100 border-blue-900 transition-all duration-300 cursor-not-allowed'>
+                  Paid
+                </button>
+              )}
+              {/* Show only one Cancel button depending on payment status */}
+              {!item.cancelled && !item.isCompleted && (
+                !item.payment ? (
+                  <button
+                    onClick={() => cancelAppointment(item._id, item.amount)}
+                    className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-600 hover:text-white transition-all duration-30 cursor-pointer'
+                  >
+                    Cancel Appointment
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => cancelAppointment(item._id, item.amount)}
+                    className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-600 hover:text-white transition-all duration-30 cursor-pointer'
+                  >
+                    Cancel Appointment
+                  </button>
+                )
+              )}
+              {item.cancelled && !item.isCompleted && (
+                <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500 cursor-not-allowed'>
+                  Appointment Cancelled
+                </button>
+              )}
+              {item.isCompleted && (
+                <button className='sm:min-w-48 py-2 border border-green-500 text-green-500'>
+                  Completed
+                </button>
+              )}
             </div>
           </div>
         ))}
