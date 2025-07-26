@@ -8,9 +8,9 @@ const DoctorContextProvider=(props)=>{
     }
 
     return (
-        <DoctorContextProvider value={value}>
+        <DoctorContext.Provider value={value}>
             {props.children}
-        </DoctorContextProvider>
+        </DoctorContext.Provider>
     )
 }
 export default DoctorContextProvider

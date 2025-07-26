@@ -12,6 +12,7 @@ import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorsList from './pages/Admin/DoctorsList';
 const App = () => {
   const { aToken } = useContext(AdminContext);
+  console.log("Hello from App.jsx");
   return aToken ? (
     <div className='bg-[#F8F9FD]'>
     <ToastContainer />
