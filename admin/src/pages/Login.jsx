@@ -3,14 +3,15 @@ import {assets} from '../assets/assets_admin/assets'
 import { AdminContext } from '../context/AdminContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { DoctorContext } from '../context/DoctorContext'
 const Login = () => {
   const [state,setState]=useState('Admin')
   const [email,setEmail]=useState('')
   const [password,setPassword]=useState('')
   const {setAToken,backendUrl}=useContext(AdminContext)
+  const {setDToken}=useContext(DoctorContext)
   const onSubmitHandler= async (event)=>{
         event.preventDefault()
-
         try {
          if(state==='Admin'){
            const {data}=await axios.post(backendUrl + '/api/admin/login',{email,password})
@@ -19,14 +20,23 @@ const Login = () => {
              console.log(data)
              localStorage.setItem('aToken',data.token)
              setAToken(data.token);
-        
            }
            else{
              toast.error(data.message)
            }
 
          }else{
-
+           const {data}=await axios.post(backendUrl + '/api/doctor/login',{email,password})
+            if(data.success){
+             console.log(data)
+             localStorage.setItem('dToken',data.token)
+             setDToken(data.token);
+             localStorage.setItem('doctorId', data.doctorId);
+             console.log(data.token)
+           }
+           else{
+             toast.error(data.message)
+           }
          }
           
         } catch (error) {
