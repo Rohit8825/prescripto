@@ -68,7 +68,7 @@ const MyAppointments = () => {
               <p className='text-xs'>{item.docData.address?.line2}</p>
               <p className='text-xs mt-1'><span className='text-sm text-neutral-700 font-medium' >Date & Time:</span>{slotDateFormat(item?.slotDate)} | {item?.slotTime}</p>
             </div>
-            <div></div>
+            
             <div className='flex flex-col gap-3 justify-end items-center'>
               {!item.cancelled && !item.isCompleted && !item.payment && (
                 <button
@@ -78,7 +78,7 @@ const MyAppointments = () => {
                   Pay Online
                 </button>
               )}
-              {item.payment && !item.cancelled && (
+              {item.payment && !item.cancelled && !item.isCompleted && (
                 <button className='text-sm text-blue-900 text-center sm:min-w-48 py-2 border hover:bg-blue-100 border-blue-900 transition-all duration-300 cursor-not-allowed'>
                   Paid
                 </button>

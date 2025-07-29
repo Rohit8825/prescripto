@@ -24,62 +24,70 @@ const Appointment = () => {
         setDocInfo(docInfo)
     }
 
-   const getAvailableSolts = async () => {
-    setDocSlots([]);
+  const getAvailableSolts = async () => {
+  setDocSlots([])
 
-    // getting current date
-    let today = new Date();
+  const today = new Date()
 
-    for (let i = 0; i < 7; i++) {
-        // getting date with index 
-        let currentDate = new Date(today);
-        currentDate.setDate(today.getDate() + i);
+  for (let i = 0; i < 7; i++) {
+    // build a date for day i
+    const dayDate = new Date(today)
+    dayDate.setDate(today.getDate() + i)
 
-        // setting end time of the date with index
-        let endTime = new Date();
-        endTime.setDate(today.getDate() + i);
-        endTime.setHours(21, 0, 0, 0);
+    // opening & closing boundaries for that date
+    const open  = new Date(dayDate)
+    const close = new Date(dayDate)
+    open.setHours(10, 0, 0, 0)
+    close.setHours(21, 0, 0, 0)
 
-        // setting hours 
-        if (today.getDate() === currentDate.getDate()) {
-            currentDate.setHours(currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10);
-            currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
-        } else {
-            currentDate.setHours(10);
-            currentDate.setMinutes(0);
-        }
+    let cursor
 
-        let timeSlots = [];
-
-        while (currentDate < endTime) {
-            let formattedTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            let day = currentDate.getDate();
-            let month = currentDate.getMonth() + 1;
-            let year = currentDate.getFullYear();
-
-            const slotDate = `${day}_${month}_${year}`;
-            const slotTime = formattedTime;
-
-            // ✅ Safe check to avoid crash if docInfo or slots_booked is undefined
-            const isSlotAvailable = !docInfo?.slots_booked?.[slotDate]?.includes(slotTime);
-
-            if (isSlotAvailable) {
-                // Add slot to array
-                timeSlots.push({
-                    datetime: new Date(currentDate),
-                    time: formattedTime
-                });
-            }
-
-            // Increment current time by 30 minutes
-            currentDate.setMinutes(currentDate.getMinutes() + 30);
-        }
-
-        // Append slots of the day
-        setDocSlots(prev => [...prev, timeSlots]);
+    if (i === 0) {
+      // today: either opening, or next half‑hour after now, or skip if past closing
+      const now = new Date()
+      if (now >= close) {
+        // no slots left today
+        continue
+      } else if (now < open) {
+        cursor = open
+      } else {
+        // round now up to next 30‑minute mark
+        const mins = now.getMinutes()
+        const addHour = mins >= 30 ? 1 : 0
+        const baseMin = mins >= 30 ? 0 : 30
+        cursor = new Date(now)
+        cursor.setHours(now.getHours() + addHour, baseMin, 0, 0)
+      }
+    } else {
+      // future days always start at opening
+      cursor = open
     }
-};
+
+    // now loop from cursor -> close in 30‑minute jumps
+    const slots = []
+    while (cursor < close) {
+      const day   = cursor.getDate()
+      const mon   = cursor.getMonth() + 1
+      const yr    = cursor.getFullYear()
+      const key   = `${day}_${mon}_${yr}`
+      const time  = cursor.toLocaleTimeString([], {
+        hour:   '2-digit',
+        minute: '2-digit'
+      })
+
+      if (!docInfo?.slots_booked?.[key]?.includes(time)) {
+        slots.push({ datetime: new Date(cursor), time })
+      }
+
+      cursor = new Date(cursor.getTime() + 30 * 60 * 1000)
+    }
+
+    if (slots.length) {
+      setDocSlots(prev => [...prev, slots])
+    }
+  }
+}
+
 
 
     const bookAppointment = async () => {

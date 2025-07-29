@@ -99,11 +99,13 @@ const appointmantCancel=async (req,res)=>{
         
         const { appointmentId } = req.body
         const appointmentData = await appointmentModel.findById(appointmentId)
-   
     await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
     //releasing doctor slot
     const {docId,slotDate,slotTime}=appointmentData
     const doctorData=await doctorModel.findById(docId)
+    if (!doctorData) {
+      return res.json({ success: false, message: "Doctor not found for this appointment." });
+    }
     let slots_booked = doctorData.slots_booked || {};
     if (Array.isArray(slots_booked[slotDate])) {
       slots_booked[slotDate] = slots_booked[slotDate].filter(slot => slot !== slotTime);

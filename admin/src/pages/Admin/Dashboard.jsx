@@ -57,11 +57,11 @@ const Dashboard = () => {
               <p className='text-gray-800 font-medium'>{item.docData?.name}</p>
               <p className='text-gray-600'>{slotDateFormat(item.slotDate)}</p>
              </div>
-              {
-                item.cancelled
-                  ? <p className='text-red-400 font-medium ml-4'>Cancelled</p>
-                  : <img onClick={()=>cancelAppointment(item._id)} className='w-10 cursor-pointer ml-4'  src={assets.cancel_icon} alt="Cancel" />
-              }
+               {
+                              item.cancelled
+                               ? <p className='text-red-400 font-medium'>Cancelled</p>
+                               : item.isCompleted ? <p className='text-green-400 font-medium'>Completed</p> : <img onClick={()=>cancelAppointment(item._id)} className='w-10 cursor-pointer'  src={assets.cancel_icon} alt="" />
+                }
             </div>
           ))
          }
