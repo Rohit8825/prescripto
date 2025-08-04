@@ -5,8 +5,7 @@ import jwt from 'jsonwebtoken'
 import {v2 as cloudinary} from 'cloudinary'
 import doctorModel from '../models/doctorModel.js'
 import appointmentModel from '../models/appointmentModel.js'
-import razorpay from 'razorpay'
-//api to register user
+
 
 const registerUser=async (req,res)=>{
     try {
@@ -22,7 +21,7 @@ const registerUser=async (req,res)=>{
             return res.json({success:false,message:"Enter a strong password"})
         }
 
-        //hashing user password
+        
         const salt=await bcrypt.genSalt(10)
         const hashedPassword=await bcrypt.hash(password,salt)
 
@@ -44,7 +43,7 @@ const registerUser=async (req,res)=>{
     }
 }
 
-//Api for user login
+
 const loginUser=async (req,res)=>{
     try {
        const {email,password}=req.body
@@ -68,7 +67,7 @@ const loginUser=async (req,res)=>{
         res.json({success:false,message:error.message})
     }
 }
-//Api to get user profile data
+
  const getProfile=async(req,res)=>{
     try {
         const {userId}=req;
@@ -83,7 +82,7 @@ const loginUser=async (req,res)=>{
 
  }
 
- //Api to update userprofile
+ 
  const updateProfile = async (req, res) => {
 
     try {
@@ -109,7 +108,7 @@ const loginUser=async (req,res)=>{
                 }
             }
 
-            // upload image to cloudinary
+            
             const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" })
             const imageURL = imageUpload.secure_url
 
@@ -124,14 +123,14 @@ const loginUser=async (req,res)=>{
     }
 }
 
-//Api to book appointment
+
 
 const bookAppointment = async (req, res) => {
   try {
     const { userId } = req;
     const { docId, slotDate, slotTime } = req.body;
 
-    // 1) fetch doctor
+    
     const docData = await doctorModel
       .findById(docId)
       .select("-password");
@@ -143,10 +142,10 @@ const bookAppointment = async (req, res) => {
       return res.json({ success: false, message: "Doctor Not Available" });
     }
 
-    // 2) ensure slots_booked is always an object
+    
     const slots_booked = docData.slots_booked || {};
 
-    // 3) ensure today's array exists, then check / push
+    
     if (!Array.isArray(slots_booked[slotDate])) {
       slots_booked[slotDate] = [];
     }
@@ -156,10 +155,10 @@ const bookAppointment = async (req, res) => {
     }
     slots_booked[slotDate].push(slotTime);
 
-    // 4) save the updated slots_booked back to doctor
+    
     await doctorModel.findByIdAndUpdate(docId, { slots_booked });
 
-    // 5) load user data (for the appointment record)
+    
     const userData = await userModel
       .findById(userId)
       .select("-password");
@@ -167,18 +166,18 @@ const bookAppointment = async (req, res) => {
       return res.json({ success: false, message: "User not found" });
     }
 
-    // 6) create appointment
+    
     const appointmentData = {
       userId,
       docId,
       userData,
       docData: {
-        // copy only public doctor fields into the appointment
+        
         name: docData.name,
         fees: docData.fees,
         address: docData.address,
         image: docData.image,
-        // …any others you need
+        
       },
       amount: docData.fees,
       slotTime,
@@ -195,12 +194,12 @@ const bookAppointment = async (req, res) => {
   }
 };
 
-//Api to get user appointments for frontend my-appointments page
+
 
 const listAppointment=async (req,res)=>{
    try {
     const userId=req.userId;
-    // console.log(userId);
+   
     
     const appointments=await appointmentModel.find({userId})
     res.json({success:true,appointments})
@@ -212,20 +211,20 @@ const listAppointment=async (req,res)=>{
    }
 }
 
-//Api to cancel appointment
+
 
 const cancelAppointment=async (req,res)=>{
   try {
         const { userId } = req;
         const { appointmentId } = req.body
         const appointmentData = await appointmentModel.findById(appointmentId)
-    //verify appointment user
+    
     if(appointmentData.userId!==userId){
       return res.json({success:false,message:"Unauthorized action"})
 
     }
     await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
-    //releasing doctor slot
+   
     const {docId,slotDate,slotTime}=appointmentData
     const doctorData=await doctorModel.findById(docId)
     let slots_booked = doctorData.slots_booked || {};
@@ -242,7 +241,7 @@ const cancelAppointment=async (req,res)=>{
   }
 }
 
-//Api to make payment of appointment using razorpay
+
 const startPayment = async(req,res)=>{
     try {
       const {appointmentId} = req.body;
@@ -263,7 +262,7 @@ const completePayment = async(req,res)=>{
     try {
       const {appointmentId} = req.body;
       const appointment = await appointmentModel.findByIdAndUpdate(appointmentId,{payment:true});
-      // console.log(success);
+     
       
       if(appointment){
           res.status(200).json({success:true, transactionId:"dummyTrasnsaction1234", message:"Success"});

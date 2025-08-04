@@ -25,7 +25,7 @@ const doctorList=async (req,res)=>{
         res.json({success:false,message:error.message})
     }
 }
-//Api for doctor login
+
 const loginDoctor=async(req,res)=>{
     try {
         const {email,password}=req.body
@@ -50,7 +50,7 @@ const loginDoctor=async(req,res)=>{
     }
 }
 
-//Api to get doctor appointments for doctor panel
+
 const appointmentsDoctor=async(req,res)=>{
      try {
 
@@ -63,7 +63,7 @@ const appointmentsDoctor=async(req,res)=>{
         res.json({ success: false, message: error.message })
     }
 }
-//Api to mark appointment complete for doctor panel
+
 const appointmentComplete = async (req, res) => {
     try {
 
@@ -86,7 +86,7 @@ const appointmentComplete = async (req, res) => {
 
 }
 
-// API to cancel appointment for doctor panel
+
 const appointmentCancel = async (req, res) => {
     try {
 
@@ -107,7 +107,7 @@ const appointmentCancel = async (req, res) => {
     }
 
 }
-// API to get dashboard data for doctor panel
+
 const doctorDashboard = async (req, res) => {
     try {
 
@@ -145,7 +145,7 @@ const doctorDashboard = async (req, res) => {
     }
 }
 
-// API to get doctor profile for  Doctor Panel
+
 const doctorProfile = async (req, res) => {
     try {
 
@@ -160,7 +160,7 @@ const doctorProfile = async (req, res) => {
     }
 }
 
-// API to update doctor profile data from  Doctor Panel
+
 const updateDoctorProfile = async (req, res) => {
     try {
 
