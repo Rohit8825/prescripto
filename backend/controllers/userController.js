@@ -72,7 +72,7 @@ const loginUser=async (req,res)=>{
     try {
         const {userId}=req;
         const userData=await userModel.findById(userId).select('-password')
-        if(!userData) res.json({success:false, message:"User not Found"});
+        if(!userData) return res.json({success:false, message:"User not Found"});
         res.json({success:true,userData})
     } catch (error) {
          console.log(error);
