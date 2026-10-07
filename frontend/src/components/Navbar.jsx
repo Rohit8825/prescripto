@@ -7,7 +7,7 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const [showMenu, setShowMenu] = useState(false);
-    const { token, setToken, profilePic,setProfilePic } = useContext(AppContext);
+    const { token, setToken, profilePic, setProfilePic, logout } = useContext(AppContext);
     const [showDropdown, setShowDropdown] = useState(false);
 
     return (
@@ -68,9 +68,7 @@ const Navbar = () => {
                                     <p
                                         className="hover:text-black cursor-pointer"
                                         onClick={() => {
-                                            setToken(false);
-                                            localStorage.clear("token");
-                                            localStorage.clear("profilePic")
+                                            logout();
                                             setShowDropdown(false);
                                         }}
                                     >

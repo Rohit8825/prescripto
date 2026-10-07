@@ -12,6 +12,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { ToastContainer, toast } from 'react-toastify';
 import Payment from './pages/Payment'
+import VerifyStripe from './pages/VerifyStripe'
  const App = () => {
   return (
     <div className='mx-4 sm:mx-[10%]'>
@@ -28,6 +29,7 @@ import Payment from './pages/Payment'
       <Route path='/my-appointment' element={<MyAppointment/>} />
       <Route path='/appointment/:docId' element={<Appointment/>} />
       <Route path='/payment/:appointmentId' element={<Payment/>} />
+      <Route path='/verify-stripe' element={<VerifyStripe/>} />
      </Routes>
      <Footer/>
     </div>

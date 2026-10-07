@@ -62,8 +62,17 @@ const loginAdmin= async (req,res)=>{
     try {
         const {email,password}=req.body
         if(email=== process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
-           const token=jwt.sign(email+password,process.env.JWT_SECRET)
-           res.json({success:true,token})
+           const accessToken = jwt.sign(
+               { role: 'admin', email: process.env.ADMIN_EMAIL },
+               process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET,
+               { expiresIn: '15m' }
+           );
+           const refreshToken = jwt.sign(
+               { role: 'admin', email: process.env.ADMIN_EMAIL },
+               process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET,
+               { expiresIn: '7d' }
+           );
+           res.json({success:true, token: accessToken, refreshToken})
         }
         else{
             res.json({success:false,message:"Invalid credentials"})
@@ -73,6 +82,43 @@ const loginAdmin= async (req,res)=>{
         res.json({success:false,message:error.message})
     }
 }
+
+const refreshTokenAdmin = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(401).json({ success: false, message: 'Refresh token required' });
+        }
+
+        const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET;
+        let decoded;
+        try {
+            decoded = jwt.verify(refreshToken, refreshSecret);
+        } catch (err) {
+            return res.status(403).json({ success: false, message: 'Invalid or expired refresh token' });
+        }
+
+        if (decoded.role !== 'admin' || decoded.email !== process.env.ADMIN_EMAIL) {
+            return res.status(403).json({ success: false, message: 'Invalid admin credentials in token' });
+        }
+
+        const newAccessToken = jwt.sign(
+            { role: 'admin', email: process.env.ADMIN_EMAIL },
+            process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET,
+            { expiresIn: '15m' }
+        );
+        const newRefreshToken = jwt.sign(
+            { role: 'admin', email: process.env.ADMIN_EMAIL },
+            process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({ success: true, token: newAccessToken, refreshToken: newRefreshToken });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 const allDoctors=async (req,res)=>{
     try {
@@ -144,4 +190,4 @@ const adminDashboard=async (req,res)=>{
     }
 }
 
-export {addDoctor,loginAdmin,allDoctors,appointmentsAdmin,appointmantCancel,adminDashboard}
+export {addDoctor,loginAdmin,refreshTokenAdmin,allDoctors,appointmentsAdmin,appointmantCancel,adminDashboard}

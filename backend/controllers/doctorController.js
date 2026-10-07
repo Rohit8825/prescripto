@@ -36,8 +36,20 @@ const loginDoctor=async(req,res)=>{
 
         const isMatch=await bcrypt.compare(password,doctor.password);
         if(isMatch){
-            const token=jwt.sign({id:doctor._id},process.env.JWT_SECRET)
-            res.json({success:true,token, doctorId: doctor._id})
+            const accessToken = jwt.sign(
+                { id: doctor._id },
+                process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET,
+                { expiresIn: '15m' }
+            );
+            const refreshToken = jwt.sign(
+                { id: doctor._id },
+                process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+            );
+            doctor.refreshToken = refreshToken;
+            await doctor.save();
+
+            res.json({success:true, token: accessToken, refreshToken, doctorId: doctor._id})
         }
         else{
             res.json({success:false,message:'Invalid Credentials'})
@@ -49,6 +61,59 @@ const loginDoctor=async(req,res)=>{
         res.json({success:false,message:error.message})
     }
 }
+
+const refreshTokenDoctor = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(401).json({ success: false, message: 'Refresh token required' });
+        }
+
+        const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET;
+        let decoded;
+        try {
+            decoded = jwt.verify(refreshToken, refreshSecret);
+        } catch (err) {
+            return res.status(403).json({ success: false, message: 'Invalid or expired refresh token' });
+        }
+
+        const doctor = await doctorModel.findById(decoded.id);
+        if (!doctor || doctor.refreshToken !== refreshToken) {
+            return res.status(403).json({ success: false, message: 'Invalid refresh token session' });
+        }
+
+        const newAccessToken = jwt.sign(
+            { id: doctor._id },
+            process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET,
+            { expiresIn: '15m' }
+        );
+        const newRefreshToken = jwt.sign(
+            { id: doctor._id },
+            process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        doctor.refreshToken = newRefreshToken;
+        await doctor.save();
+
+        res.json({ success: true, token: newAccessToken, refreshToken: newRefreshToken, doctorId: doctor._id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const logoutDoctor = async (req, res) => {
+    try {
+        const { docId } = req;
+        if (docId) {
+            await doctorModel.findByIdAndUpdate(docId, { refreshToken: '' });
+        }
+        res.json({ success: true, message: 'Logged out successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 
 const appointmentsDoctor=async(req,res)=>{
@@ -179,4 +244,16 @@ const updateDoctorProfile = async (req, res) => {
 }
 
 
-export {changeAvailability,doctorList,loginDoctor,appointmentsDoctor,appointmentCancel,appointmentComplete,doctorDashboard,updateDoctorProfile,doctorProfile}
+export {
+    changeAvailability,
+    doctorList,
+    loginDoctor,
+    refreshTokenDoctor,
+    logoutDoctor,
+    appointmentsDoctor,
+    appointmentCancel,
+    appointmentComplete,
+    doctorDashboard,
+    updateDoctorProfile,
+    doctorProfile
+}

@@ -8,17 +8,19 @@ const Login = () => {
   const [state,setState]=useState('Admin')
   const [email,setEmail]=useState('')
   const [password,setPassword]=useState('')
-  const {setAToken,backendUrl}=useContext(AdminContext)
-  const {setDToken}=useContext(DoctorContext)
+  const {setAToken,setARefreshToken,backendUrl}=useContext(AdminContext)
+  const {setDToken,setDRefreshToken}=useContext(DoctorContext)
   const onSubmitHandler= async (event)=>{
         event.preventDefault()
         try {
          if(state==='Admin'){
            const {data}=await axios.post(backendUrl + '/api/admin/login',{email,password})
-           console.log(data)
            if(data.success){
-             console.log(data)
              localStorage.setItem('aToken',data.token)
+             if(data.refreshToken){
+               localStorage.setItem('aRefreshToken',data.refreshToken)
+               setARefreshToken(data.refreshToken);
+             }
              setAToken(data.token);
            }
            else{
@@ -28,11 +30,13 @@ const Login = () => {
          }else{
            const {data}=await axios.post(backendUrl + '/api/doctor/login',{email,password})
             if(data.success){
-             console.log(data)
              localStorage.setItem('dToken',data.token)
+             if(data.refreshToken){
+               localStorage.setItem('dRefreshToken',data.refreshToken)
+               setDRefreshToken(data.refreshToken);
+             }
              setDToken(data.token);
              localStorage.setItem('doctorId', data.doctorId);
-             console.log(data.token)
            }
            else{
              toast.error(data.message)
@@ -40,7 +44,7 @@ const Login = () => {
          }
           
         } catch (error) {
-          
+          toast.error(error.message)
         }
   }
   return (
